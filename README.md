@@ -27,6 +27,7 @@ Configuration of the bean is done with environment variables:
 
         @GET
         @Path("dangerous")
+        @RequiresAdmin
         public Response somethingProtected() {
             ...
             return Response.
