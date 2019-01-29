@@ -19,10 +19,12 @@
 package dk.dbc.remoteadminaccess;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -32,6 +34,9 @@ import org.slf4j.LoggerFactory;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 
 /**
+ * Request filter checking for the presence of @{@link RequiresAdmin} annotation
+ * on both method and class level. Then it enforces the
+ * {@link RemoteAccessRules} rules
  *
  * @author Morten Bøgeskov (mb@dbc.dk)
  */
@@ -45,11 +50,20 @@ public class RemoteAccessRestriction implements ContainerRequestFilter {
     @Context
     private HttpServletRequest servletRequest;
 
+    // https://stackoverflow.com/questions/31974857/jersey-2-containerrequestfilter-get-method-annotation
+    @Context
+    private ResourceInfo resourceInfo;
+
     @EJB
     private RemoteAccessRules remoteAccess;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        Method method = resourceInfo.getResourceMethod();
+        Class<?> clazz = method.getDeclaringClass();
+        if (method.getAnnotation(RequiresAdmin.class) == null &&
+            clazz.getAnnotation(RequiresAdmin.class) == null)
+            return;
         String ip = remoteAccess.remoteIp(
                 servletRequest.getRemoteAddr(),
                 requestContext.getHeaderString("x-forwarded-for"));
@@ -64,5 +78,4 @@ public class RemoteAccessRestriction implements ContainerRequestFilter {
                             .build());
         }
     }
-
 }

@@ -33,6 +33,10 @@ import org.slf4j.LoggerFactory;
 import static java.util.Collections.EMPTY_LIST;
 
 /**
+ * Bean that exposes remote access verification methods based upon the
+ * environment variables $X_FORWARDED_FOR and $ADMIN_IP
+ * <p>
+ * Currently only supports IPv4
  *
  * @author Morten Bøgeskov (mb@dbc.dk)
  */
