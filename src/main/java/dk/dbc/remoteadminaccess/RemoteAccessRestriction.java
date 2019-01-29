@@ -41,7 +41,6 @@ import static javax.ws.rs.core.Response.Status.FORBIDDEN;
  * @author Morten Bøgeskov (mb@dbc.dk)
  */
 @Provider
-@RequiresAdmin
 public class RemoteAccessRestriction implements ContainerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(RemoteAccessRestriction.class);
